@@ -1,0 +1,106 @@
+from googleapiclient.discovery import build
+import pandas as pd
+import re
+
+def obter_comentarios(youtube, **kwargs):
+    ids_comentarios = []
+    datas = []
+    likes = []
+    autores = []
+    links_canais = []
+    comentarios = []
+    resultados = youtube.commentThreads().list(**kwargs).execute()
+
+    while resultados:
+        for item in resultados['items']:
+            comentario = item['snippet']['topLevelComment']['snippet']
+            ids_comentarios.append(item['snippet']['topLevelComment']['id'])
+            datas.append(comentario['publishedAt'])
+            likes.append(comentario['likeCount'])
+            autores.append(comentario['authorDisplayName'])
+            links_canais.append(f"https://www.youtube.com/channel/{comentario['authorChannelId']['value']}")
+            comentarios.append(comentario['textDisplay'])
+
+        if 'nextPageToken' in resultados:
+            kwargs['pageToken'] = resultados['nextPageToken']
+            resultados = youtube.commentThreads().list(**kwargs).execute()
+        else:
+            break
+
+    return ids_comentarios, datas, likes, autores, links_canais, comentarios
+
+def extrair_video_id(url):
+    # Extrai o ID do vÃƒÂ­deo do YouTube de uma URL
+    video_id = re.search(r'v=([A-Za-z0-9_-]+)', url).group(1)
+    return video_id
+
+if __name__ == "__main__":
+    # Inicialize a API do YouTube
+    chave_api = 'API YOUTUBE'  # (AtenÃƒÂ§ÃƒÂ£o: NÃƒÂ£o compartilhe sua chave API publicamente)
+    youtube = build('youtube', 'v3', developerKey=chave_api)
+
+    # URL do vÃƒÂ­deo do qual vocÃƒÂª deseja raspar os comentÃƒÂ¡rios (Altere esta URL conforme necessÃƒÂ¡rio)
+    url_video = 'Insira aqui o URL desejado'
+    id_video = extrair_video_id(url_video)
+
+    # Raspe os comentÃƒÂ¡rios
+    ids_comentarios, datas, likes, autores, links_canais, comentarios = obter_comentarios(youtube, part='snippet', videoId=id_video, textFormat='plainText')
+
+    # Crie um DataFrame com os dados raspados
+    df = pd.DataFrame({
+        'ID do ComentÃƒÂ¡rio': ids_comentarios,
+        'Data': datas,
+        'Likes': likes,
+        'Autor': autores,
+        'Link do Canal': links_canais,
+        'ComentÃƒÂ¡rio': comentarios,
+        'Sentimento': [''] * len(comentarios)  # Coluna vazia para Sentimento
+    })
+
+    # Salve o DataFrame como um arquivo CSV
+    df.to_csv('comentarios_youtube.csv', index=False)
+
+    from googleapiclient.discovery import build
+import pandas as pd
+import re
+import openai
+
+# Configurar a chave da API do OpenAI (VocÃª precisa obter essa chave do portal do OpenAI)
+CHAVE_API_OPENAI = 'API OPENAI'
+
+# Inicializa a biblioteca openai
+openai.api_key = CHAVE_API_OPENAI
+
+def analisar_sentimento(comentario):
+    response = openai.Completion.create(
+      engine="davinci",
+      prompt=f"Classifique o sentimento do seguinte comentÃ¡rio: '{comentario}' como Positivo, Negativo ou Neutro.",
+      max_tokens=50
+    )
+    sentimento = response.choices[0].text.strip()
+    return sentimento
+
+# [O restante do seu cÃ³digo permanece o mesmo atÃ© a parte onde vocÃª cria o DataFrame]
+
+if __name__ == "__main__":
+    # [Todo o cÃ³digo de inicializaÃ§Ã£o permanece o mesmo]
+
+    # Raspe os comentÃ¡rios
+    ids_comentarios, datas, likes, autores, links_canais, comentarios = obter_comentarios(youtube, part='snippet', videoId=id_video, textFormat='plainText')
+
+    sentimentos = [analisar_sentimento(comentario) for comentario in comentarios]
+
+    # Crie um DataFrame com os dados raspados
+    df = pd.DataFrame({
+        'ID do ComentÃ¡rio': ids_comentarios,
+        'Data': datas,
+        'Likes': likes,
+        'Autor': autores,
+        'Link do Canal': links_canais,
+        'ComentÃ¡rio': comentarios,
+        'Sentimento': sentimentos
+    })
+
+    # Salve o DataFrame como um arquivo CSV
+    df.to_csv('comentarios_youtube.csv', index=False)
+
