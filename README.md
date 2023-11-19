@@ -1,3 +1,11 @@
+Este projeto utiliza Python para raspar dados de comentários de vídeos do YouTube, oferecendo uma ferramenta poderosa para análise de sentimentos, pesquisa de mercado e insights educacionais. Através de duas APIs chave – a API do YouTube e a API da OpenAI –, ele permite coletar dados ricos, como comentários, contagem de likes, datas, nomes de usuários e links para perfis do YouTube.
+
+O diferencial deste projeto é sua flexibilidade: ao inserir a API do YouTube, os usuários podem facilmente raspar dados. Para análises mais profundas, como interpretação de comentários com modelos de linguagem avançados, a API da OpenAI pode ser integrada. Vale ressaltar que o uso da API da OpenAI implica em custos adicionais.
+
+Inicialmente projetado para análise de sentimentos, a aplicabilidade da ferramenta se expandiu para áreas como análise de concorrência e identificação de lacunas didáticas. Um exemplo notável de sua eficácia é a análise de feedback de cursos, onde a ferramenta destacou informações desatualizadas, erros de design e omissões cruciais, permitindo correções significativas.
+
+Usuários podem executar análises complexas ou simples, dependendo da necessidade. Com a capacidade de processar milhares de comentários em um único prompt, especialmente com as atualizações recentes dos modelos GPT que suportam até 128k de tokens, a ferramenta se mostra extremamente versátil.
+
 # Analise-de-coment-rios-do-Youtube
 Web Scraping em python para coletar comentários do Youtube
 Criar um benchmark para análise de sentimentos de comentários do YouTube exige uma estrutura bem planejada. Vamos dividi-lo em etapas:
